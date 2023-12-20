@@ -1,0 +1,33 @@
+name: build hello
+run-name: ${{ github.actor }} is building hello 🚀
+on:
+  push:
+    branches:
+    - main
+  workflow_dispatch:
+jobs:
+  Explore-GitHub-Actions:
+    runs-on: self-hosted
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      
+      - name: Login to Amazon ECR Public
+        id: login-ecr-public
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registry-type: public
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        env:
+          REGISTRY: docker.io
+          REGISTRY_ALIAS: krisek11
+          REPOSITORY: hello-api
+          IMAGE_TAG: ${{ github.sha }}
+        with:
+          push: true
+          tags: | 
+            $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG
+
+      - run: echo "🍏 This job's status is ${{ job.status }}."
